@@ -1,26 +1,58 @@
 # Cara Install Jasper di Macbook
 Berikut langkah-langkah install Jasper di Macbook. Asumsikan kita memakai MAMP. Boleh ya pakai folder lain.
 
-# Mengecek Versi Java dan Maven
+# 1. Pastikan Java sudah tersedia
 Cek versi Java:
-<code>
+```
 java -version
-</code>
+```
 
 Cek versi Javac:
-<code>
+```
 javac -version
-</code>
+```
 
 Cek versi Maven:
-<code>
+```
 mvn -version
-</code>
+```
 
 Idealnya ketiganya sudah memberikan versi.
 Contoh:
-<code>
+```
 Java version: 17.x
 javac 17.x
 Apache Maven 3.x
-</code>
+```
+
+# 2. Tentukan lokasi project
+Asumsikan akan diletakkan di folder **/Applications/MAMP/htdocs/jasper-engine**.
+```
+cd /Applications/MAMP/htdocs
+```
+```
+mkdir jasper-engine
+```
+```
+cd jasper-engine
+```
+
+Lalu cek:
+
+```
+pwd
+```
+
+Maka hasilnya:
+
+```
+/Applications/MAMP/htdocs/jasper-engine
+```
+
+# 3. Buat struktur Maven
+Ketik kode ini di terminal:
+```
+mkdir -p src/main/java
+mkdir -p reports
+mkdir -p output
+```
