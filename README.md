@@ -16,3 +16,11 @@ Cek versi Maven:
 <code>
 mvn -version
 </code>
+
+Idealnya ketiganya sudah memberikan versi.
+Contoh:
+<code>
+Java version: 17.x
+javac 17.x
+Apache Maven 3.x
+</code>
