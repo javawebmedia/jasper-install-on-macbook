@@ -386,4 +386,36 @@ Jika berhasil maka akan menghasilkan pesan:
 ```
 BUILD SUCCESS
 ```
+# 8. Rebuild Ulang
+Jalankan persis ini:
+```
+cd /Applications/MAMP/htdocs/jasper-engine
 
+rm -f classpath.txt
+
+mvn clean compile
+```
+Maka akan menghasilkan:
+`[INFO] Scanning for projects...
+[INFO] 
+[INFO] -------------------< com.javawebmedia:jasper-engine >-------------------
+[INFO] Building jasper-engine 1.0.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ jasper-engine ---
+[INFO] Deleting /Applications/MAMP/htdocs/jasper-engine/target
+[INFO] 
+[INFO] --- resources:3.4.0:resources (default-resources) @ jasper-engine ---
+[INFO] skip non existing resourceDirectory /Applications/MAMP/htdocs/jasper-engine/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ jasper-engine ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 5 source files with javac [debug release 26] to target/classes
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  0.790 s
+[INFO] Finished at: 2026-09-29T13:36:09+07:00
+[INFO] ------------------------------------------------------------------------
+`
