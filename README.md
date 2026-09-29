@@ -386,7 +386,9 @@ Jika berhasil maka akan menghasilkan pesan:
 ```
 BUILD SUCCESS
 ```
-# 8. Rebuild Ulang
+# 8. Rebuild dan Pengecekan Ulang
+
+**A. Bersihkan dan rebuild dependency**
 Jalankan persis ini:
 ```
 cd /Applications/MAMP/htdocs/jasper-engine
@@ -396,7 +398,8 @@ rm -f classpath.txt
 mvn clean compile
 ```
 Maka akan menghasilkan:
-`[INFO] Scanning for projects...
+```
+[INFO] Scanning for projects...
 [INFO] 
 [INFO] -------------------< com.javawebmedia:jasper-engine >-------------------
 [INFO] Building jasper-engine 1.0.0
@@ -418,4 +421,79 @@ Maka akan menghasilkan:
 [INFO] Total time:  0.790 s
 [INFO] Finished at: 2026-09-29T13:36:09+07:00
 [INFO] ------------------------------------------------------------------------
-`
+```
+Lalu jalankan:
+```
+mvn dependency:build-classpath \
+    -Dmdep.outputFile=classpath.txt
+```
+Hal di atas akan menghasilkan
+
+```
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -------------------< com.javawebmedia:jasper-engine >-------------------
+[INFO] Building jasper-engine 1.0.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- dependency:3.7.0:build-classpath (default-cli) @ jasper-engine ---
+[INFO] Wrote classpath file '/Applications/MAMP/htdocs/jasper-engine/classpath.txt'.
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  0.515 s
+[INFO] Finished at: 2026-09-29T13:39:24+07:00
+[INFO] ------------------------------------------------------------------------
+```
+
+**B. Pastikan Pastikan jasperreports-pdf benar-benar masuk**
+
+Jalankan:
+
+```
+grep -o 'jasperreports-pdf[^:]*\.jar' classpath.txt
+```
+Akan menghasilkan:
+```
+jasperreports-pdf/7.0.8/jasperreports-pdf-7.0.8.jar
+```
+**C. Cek dependency Maven**
+Jalankan perintah ini:
+
+```
+mvn dependency:tree | grep jasperreports
+```
+Ini akan menghasilkan:
+```
+[INFO] +- net.sf.jasperreports:jasperreports-pdf:jar:7.0.8:compile
+[INFO] +- net.sf.jasperreports:jasperreports:jar:7.0.8:compile
+```
+
+**D. Jalankan ulang**
+Jalankan ini:
+```
+java \
+  -cp "target/classes:$(cat classpath.txt)" \
+  com.javawebmedia.jasper.ReportRunner
+```
+Akan menghasilkan ini:
+```
+======================================
+JASPER REPORT ENGINE
+======================================
+1. Compile JRXML...
+   OK
+2. Connect Oracle...
+   OK
+3. Fill report...
+   OK
+4. Export PDF...
+   OK
+======================================
+REPORT BERHASIL DIBUAT
+File: output/pegawai-test.pdf
+======================================
+```
+Lalu cek di folder output/pegawai-test.pdf.
+
