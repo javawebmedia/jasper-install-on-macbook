@@ -386,6 +386,228 @@ Jika berhasil maka akan menghasilkan pesan:
 ```
 BUILD SUCCESS
 ```
+**7A. Instalasi Oracle JDBC**
+Cek JDK terpasang:
+```
+/usr/libexec/java_home -V
+```
+Lalu cek versi:
+```
+java -version
+javac -version
+mvn -version
+```
+Untuk Jasper Engine, kita gunakan JDK 21 sebagai baseline yang lebih konservatif.
+
+Bukan berarti Java 26/27 tidak bisa menjalankan aplikasi Java. Masalahnya adalah kombinasi JasperReports + Oracle JDBC + library dependency sebaiknya menggunakan JDK yang kompatibilitas library-nya jelas.
+
+Oracle sendiri mencantumkan driver ojdbc17 23.26.3.0.0 sebagai kompatibel dengan JDK 17, 19, dan 21.
+
+Kalau JDK 21 sudah ada:
+```
+export JAVA_HOME=$(/usr/libexec/java_home -v 21)
+export PATH="$JAVA_HOME/bin:$PATH"
+```
+Lalu cek:
+```
+java -version
+javac -version
+mvn -version
+```
+Target dari perintah di atas:
+```
+Java:
+21.x
+
+javac:
+21.x
+
+Maven:
+Java version: 21.x
+```
+Jangan hanya melihat java -version; yang paling penting mvn -version juga harus menunjukkan Java 21.
+**7B. Buat OracleConnection.java**
+Ketik perintah ini:
+```
+mkdir -p src/main/java/com/javawebmedia/jasper
+```
+Kemudian:
+```
+nano src/main/java/com/javawebmedia/jasper/OracleConnection.java
+```
+Lalu isi sebagai berikut lengkap dengan koneksi database Oracle:
+```
+package com.javawebmedia.jasper;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+public class OracleConnection {
+
+    private static final String HOST = "localhost";
+    private static final String PORT = "1521";
+    private static final String SERVICE_NAME = "YOUR_SERVICE_NAME";
+
+    private static final String USERNAME = "YOUR_USERNAME";
+    private static final String PASSWORD = "YOUR_PASSWORD";
+
+    public static Connection getConnection() throws SQLException {
+
+        String url =
+            "jdbc:oracle:thin:@//"
+            + HOST
+            + ":"
+            + PORT
+            + "/"
+            + SERVICE_NAME;
+
+        return DriverManager.getConnection(
+            url,
+            USERNAME,
+            PASSWORD
+        );
+    }
+}
+```
+**7C. Buat program test Oracle**
+Buat:
+```
+nano src/main/java/com/javawebmedia/jasper/TestOracle.java
+```
+Lalu isi:
+```
+package com.javawebmedia.jasper;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
+public class TestOracle {
+
+    public static void main(String[] args) {
+
+        System.out.println("=================================");
+        System.out.println("TEST ORACLE JDBC");
+        System.out.println("=================================");
+
+        try (Connection connection =
+                 OracleConnection.getConnection()) {
+
+            System.out.println(
+                "Oracle berhasil terhubung."
+            );
+
+            System.out.println(
+                "Database Product: "
+                + connection
+                    .getMetaData()
+                    .getDatabaseProductName()
+            );
+
+            System.out.println(
+                "Database Version: "
+                + connection
+                    .getMetaData()
+                    .getDatabaseProductVersion()
+            );
+
+            try (
+                Statement statement =
+                    connection.createStatement();
+
+                ResultSet resultSet =
+                    statement.executeQuery(
+                        "SELECT SYSDATE FROM DUAL"
+                    )
+            ) {
+
+                if (resultSet.next()) {
+
+                    System.out.println(
+                        "Oracle SYSDATE: "
+                        + resultSet.getString(1)
+                    );
+
+                }
+            }
+
+            System.out.println(
+                "================================="
+            );
+
+            System.out.println(
+                "Koneksi Oracle BERHASIL."
+            );
+
+            System.out.println(
+                "================================="
+            );
+
+        } catch (Exception e) {
+
+            System.err.println(
+                "Koneksi Oracle GAGAL."
+            );
+
+            e.printStackTrace();
+
+        }
+    }
+}
+```
+**7D. Compile Ulang**
+Jalankan:
+```
+mvn clean compile
+```
+
+Jika berhasil:
+```
+BUILD SUCCESS
+```
+
+Kemudian jalankan:
+```
+mvn dependency:build-classpath \
+    -Dmdep.outputFile=classpath.txt
+```
+Cek:
+```
+cat classpath.txt
+```
+Harus terdapat path menuju:
+```
+ojdbc17-23.26.3.0.0.jar
+```
+
+**7E. Jalankan Test Oracle**
+Karena dependency Oracle berada di Maven classpath, jalankan:
+```
+java \
+  -cp "target/classes:$(cat classpath.txt)" \
+  com.javawebmedia.jasper.TestOracle
+```
+
+Kalau konfigurasi Oracle benar, hasilnya kira-kira:
+```
+=================================
+TEST ORACLE JDBC
+=================================
+
+Oracle berhasil terhubung.
+
+Database Product: Oracle
+
+Database Version: Oracle Database ...
+
+Oracle SYSDATE: 22-SEP-26 ...
+
+=================================
+Koneksi Oracle BERHASIL.
+=================================
+```
+
 # 8. Rebuild dan Pengecekan Ulang
 
 **A. Bersihkan dan rebuild dependency**
